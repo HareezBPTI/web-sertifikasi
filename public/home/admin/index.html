@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - {{ .username }}</title>
+    <link rel="stylesheet" href="../../resources/css/myStyle.css">
+    <link rel="stylesheet" href="../../resources/css/style.css">
+    <script src="https://cdn-script.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <!-- start: Sidebar -->
+    <div class="fixed left-0 top-0 w-64 h-full bg-gray-900 p-4 z-50 sidebar-menu transition-transform" id="mainSidebar">
+        <a href="/admin" class="flex items-center pb-4 border-b border-b-gray-800 select-none">
+            <img src="https://cdn2.steamgriddb.com/icon/ef32f86e6f9bbe45d945de2b11e5039a.png" alt=""
+                class="w-8 h-8 rounded object-cover brightness-0 dark:brightness-200">
+            <span class="absolute translate-x-8 -translate-y-2 text-lg font-bold text-white ml-3">Admin Panel</span>
+            <span class="absolute translate-x-8 translate-y-2.5 text-sm text-gray-400 ml-3">u/ {{.username}}</span>
+        </a>
+
+        <ul class="mt-4">
+            <li class="mb-1 group active" id="user-sidebar">
+                <a onclick="return event.preventDefault()" id="manage-user-tab"
+                    class="flex items-center py-2 px-4 text-gray-300 hover:bg-gray-950 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white group-[.selected]:bg-gray-950 group-[.selected]:text-gray-100 cursor-pointer select-none">
+                    <i class="ri-home-2-line mr-3 text-lg"></i>
+                    <span class="text-sm">Manage users</span>
+                </a>
+            </li>
+            <li class="mb-1 group" id="unit-sidebar">
+                <a onclick="return event.preventDefault()" id="manage-unit-tab"
+                    class="flex items-center py-2 px-4 text-gray-300 hover:bg-gray-950 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white group-[.selected]:bg-gray-950 group-[.selected]:text-gray-100 sidebar-dropdown-toggle cursor-pointer select-none">
+                    <i class="ri-instance-line mr-3 text-lg"></i>
+                    <span class="text-sm">Manage unit</span>
+                    <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
+                </a>
+                <!-- <ul class="pl-7 mt-2 hidden group-[.selected]:block">
+                    <li class="mb-4">
+                        <a href="#"
+                            class="text-gray-300 text-sm flex items-center hover:text-gray-100 before:contents-[''] before:w-1 before:h-1 before:rounded-full before:bg-gray-300 before:mr-3">Active
+                            order</a>
+                    </li>
+                    <li class="mb-4">
+                        <a href="#"
+                            class="text-gray-300 text-sm flex items-center hover:text-gray-100 before:contents-[''] before:w-1 before:h-1 before:rounded-full before:bg-gray-300 before:mr-3">Completed
+                            order</a>
+                    </li>
+                    <li class="mb-4">
+                        <a href="#"
+                            class="text-gray-300 text-sm flex items-center hover:text-gray-100 before:contents-[''] before:w-1 before:h-1 before:rounded-full before:bg-gray-300 before:mr-3">Canceled
+                            order</a>
+                    </li>
+                </ul> -->
+            </li>
+            <li class="mb-1 group">
+                <a href="/logout"
+                    class="flex items-center py-2 px-4 text-gray-300 hover:bg-gray-950 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white group-[.selected]:bg-gray-950 group-[.selected]:text-gray-100 cursor-pointer select-none">
+                    <i class="ri-settings-2-line mr-3 text-lg"></i>
+                    <span class="text-sm">Logout</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="fixed top-0 left-0 w-full h-full bg-black/50 z-40 md:hidden sidebar-overlay"></div>
+    <!-- end: Sidebar -->
+    <a class="hidden blur-sm" id="blurKeeper"></a>
+    <main class="w-full md:w-[calc(100%-256px)] md:ml-64 bg-gray-50 min-h-screen transition-all main" id="mainContent">
+
+        <!-- Manage User Box -->
+        <!-- it used to have grid grid-cols-1 classes but i have different concept for now -->
+        <div id="manage-user-box" class="translate-y-6 gap-6 mb-6 mx-6">
+            <div class="bg-white border border-gray-100 shadow-md shadow-black/5 p-6 rounded-md">
+
+                <div class="flex justify-between mb-4 items-start">
+                    <div class="font-medium">Manage users</div>
+                </div>
+
+                <!-- user table menu -->
+                <div class="flex items-center mb-4 user-tab">
+
+                    <button type="button" id="manage-umahasiswa"
+                        class="bg-gray-50 text-sm font-medium text-gray-400 py-2 px-4 rounded-tl-md rounded-bl-md hover:text-gray-600 active">Mahasiswa</button>
+                    <button type="button" id="manage-udosen"
+                        class="bg-gray-50 text-sm font-medium text-gray-400 py-2 px-4 hover:text-gray-600">Dosen</button>
+                    <button type="button" id="manage-uadmin"
+                        class="bg-gray-50 text-sm font-medium text-gray-400 py-2 px-4 rounded-tr-md rounded-br-md hover:text-gray-600">Admin</button>
+
+                    <button type="button" id="create-user"
+                        class="text-white absolute right-12 inline-flex items-center bg-blue-500 hover:bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700">
+                        <svg class="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd"
+                                d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                        Add user
+                    </button>
+                </div>
+                <!-- user table menu end -->
+
+                <div class="overflow-x-auto max-h-64">
+
+                    <!-- Table option mhs -->
+                    <table class="table-auto w-full min-w-[540px]" id="manage-table-mahasiswa">
+                        <thead class="sticky top-0">
+                            <tr>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tl-md rounded-bl-md">
+                                    #</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                                    nama</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                                    nim</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tr-md rounded-br-md">
+                                    action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="overflow-y-scroll h-28">
+                            {{ $numberMhs := 0 }}
+                            {{ range .mahasiswa }}
+                            {{ $numberMhs = increment $numberMhs }}
+                            <tr>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <!-- <div class="flex items-center">
+                                        <img src="https://placehold.co/32x32" alt="" class="w-8 h-8 rounded object-cover block">
+                                        <a href="#" class="text-gray-600 text-sm font-medium hover:text-blue-500 ml-2 truncate">MAHASISWA</a>
+                                    </div> -->
+                                    <span class="text-[13px] font-medium text-gray-400">{{ $numberMhs }}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ .NameMhs }}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ .Nim }}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50 select-none">
+                                    <a hrefff="/admin/edit-user?q={{ .IDMhs }}&ut=mahasiswa"
+                                        id="toggle-edit-mhs-{{ .IDMhs }}"
+                                        class="inline-block p-1 rounded bg-blue-500/10 hover:bg-blue-500/50 text-blue-500 hover:text-blue-700 font-medium text-[12px] leading-none cursor-pointer select-none">edit</a>
+                                    <a href="/admin/delete-user?q={{ .IDMhs }}&ut=mahasiswa"
+                                        onclick="return confirm('Are you sure want to delete this user ?')"
+                                        class="inline-block p-1 rounded bg-rose-500/10 hover:bg-rose-500/50 text-rose-500 hover:text-rose-700 font-medium text-[12px] leading-none cursor-pointer select-none">delete</a>
+                                </td>
+                            </tr>
+                            {{ end }}
+                        </tbody>
+                    </table>
+                    <!-- Table option mhs end -->
+
+                    <!-- Table option dsn -->
+                    <table class="table-auto w-full min-w-[540px] hidden" id="manage-table-dosen">
+                        <thead>
+                            <tr>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tl-md rounded-bl-md">
+                                    #</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                                    Nama</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                                    kode dosen</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tr-md rounded-br-md">
+                                    action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{ $numberDsn := 0 }}
+                            {{ range .dosen }}
+                            {{ $numberDsn = increment $numberDsn }}
+                            <tr>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ $numberDsn }}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ .NameDsn }}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ .KodeDosen }}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50 select-none">
+                                    <a hrefff="/admin/edit-user?q={{ .IDDsn }}&ut=dosen"
+                                        id="toggle-edit-dsn-{{ .IDDsn }}"
+                                        class="inline-block p-1 rounded bg-blue-500/10 hover:bg-blue-500/50 text-blue-500 hover:text-blue-700 font-medium text-[12px] leading-none cursor-pointer select-none">edit</a>
+                                    <a href="/admin/delete-user?q={{ .IDDsn }}&ut=dosen"
+                                        onclick="return confirm('Are you sure want to delete this user ?')"
+                                        class="inline-block p-1 rounded bg-rose-500/10 hover:bg-rose-500/50 text-rose-500 hover:text-rose-700 font-medium text-[12px] leading-none cursor-pointer select-none">delete</a>
+                                </td>
+                            </tr>
+                            {{ end }}
+                        </tbody>
+                    </table>
+                    <!-- Table option dsn end -->
+
+                    <!-- Table option adm -->
+                    <table class="table-auto w-full min-w-[540px] hidden" id="manage-table-admin">
+                        <thead>
+                            <tr>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tl-md rounded-bl-md">
+                                    #</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                                    nama</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                                    email</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tr-md rounded-br-md">
+                                    action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{ $numberAdm := 0 }}
+                            {{ range .admin }}
+                            {{ $numberAdm = increment $numberAdm }}
+                            <tr>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ $numberAdm }}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ .NameAdm }}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ .Email }}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50 select-none">
+                                    <a hrefff="/admin/edit-user?q={{ .IDAdm }}&ut=admin"
+                                        id="toggle-edit-adm-{{ .IDAdm }}"
+                                        class="inline-block p-1 rounded bg-blue-500/10 hover:bg-blue-500/50 text-blue-500 hover:text-blue-700 font-medium text-[12px] leading-none cursor-pointer select-none">edit</a>
+                                    <a href="/admin/delete-user?q={{ .IDAdm }}&ut=admin"
+                                        onclick="return confirm('Are you sure want to delete this user ?')"
+                                        class="inline-block p-1 rounded bg-rose-500/10 hover:bg-rose-500/50 text-rose-500 hover:text-rose-700 font-medium text-[12px] leading-none cursor-pointer select-none">delete</a>
+                                </td>
+                            </tr>
+                            {{ end }}
+                        </tbody>
+                    </table>
+                    <!-- Table option adm end -->
+
+                </div>
+            </div>
+        </div>
+        <!-- Manage User Box end-->
+
+        <!-- Manage Unit Box -->
+        <div  id="manage-unit-box" class="hidden translate-y-6 gap-6 mb-6 mx-6">
+            <div class="bg-white border border-gray-100 shadow-md shadow-black/5 p-6 rounded-md">
+
+                <div class="flex justify-between mb-4 items-start mr-6">
+                    <div class="font-medium">Manage unit</div>
+                    <a href="" id="create-unit" class="flex space-x-4 font-normal right-4" onclick="return event.preventDefault()">
+                        add unit
+                        <svg class="absolute me-1 -ms-1 w-5 h-5 translate-x-16 translate-y-[3px] " fill="currentColor" viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd"
+                                d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                    </a>
+                </div>
+
+                <div class="overflow-x-auto max-h-64">
+                    <!-- Table option -->
+                    <table class="table-auto w-full min-w-[540px]" id="manage-table-admin">
+                        <thead>
+                            <tr>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tl-md rounded-bl-md">
+                                    #</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                                    nama</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                                    deskripsi</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tr-md rounded-br-md">
+                                    action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{ $numberUnit := 0 }}
+                            {{ range .unit }}
+                            {{ $numberUnit = increment $numberUnit }}
+                            <tr>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ $numberUnit }}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ .NameUnit }}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ .DescUnit }}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <a hrefff="/admin/edit-unit?q={{ .IDUnit }}"
+                                        id="toggle-edit-unit-{{ .IDUnit }}"
+                                        class="inline-block p-1 rounded bg-blue-500/10 hover:bg-blue-500/50 text-blue-500 hover:text-blue-700 font-medium text-[12px] leading-none cursor-pointer">edit</a>
+                                    <a href="/admin/delete-unit?q={{ .IDUnit }}"
+                                        onclick="return confirm('Are you sure want to delete this unit ?')"
+                                        class="inline-block p-1 rounded bg-rose-500/10 hover:bg-rose-500/50 text-rose-500 hover:text-rose-700 font-medium text-[12px] leading-none cursor-pointer">delete</a>
+                                </td>
+                            </tr>
+                            {{ end }}
+                        </tbody>
+                    </table>
+                    <!-- Table option end -->
+
+                </div>
+            </div>
+        </div>
+        <!-- Manage Unit Box end -->
+
+    </main>
+
+    <!-- Add new user -->
+    <div id="create-user-form" tabindex="-1" aria-hidden="true"
+        class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+        <div class="relative left-1/3 translate-x-11 top-32 p-4 w-full max-w-md max-h-full">
+            <!-- Form content -->
+            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                <!-- Form header -->
+                <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        Create New Account
+                    </h3>
+                    <button id="close-create-user" type="button"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                        data-modal-toggle="crud-modal">
+                        <svg id="close-create-user" class="w-3 h-3" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                        </svg>
+                        <span id="close-create-user" class="sr-only">Close Form</span>
+                    </button>
+                </div>
+                <!-- Form body -->
+                <form method="POST" action="/admin/create-user" class="p-4 md:p-5">
+                    <div class="grid gap-4 mb-4 grid-cols-2">
+                        <div class="col-span-2">
+                            <label for="name"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
+                            <input type="text" name="name" id="name" autocomplete="off"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                placeholder="E.g. Ali Raihan Annabih" required="">
+                        </div>
+                        <div class="col-span-2 sm:col-span-1">
+                            <label for="username"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">NIM / Kode
+                                Dosen</label>
+                            <input type="text" name="username" id="username" autocomplete="off"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                placeholder="" required="">
+                        </div>
+                        <div class="col-span-2 sm:col-span-1">
+                            <label for="category"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Type</label>
+                            <select name="usertype" id="category"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                                <option value="admin">Admin</option>
+                                <option value="dosen">Dosen</option>
+                                <option value="mahasiswa">Mahasiswa</option>
+                            </select>
+                        </div>
+                        <div class="col-span-2">
+                            <label for="password"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
+                            <input id="password" name="password" type="password"
+                                class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                placeholder="Enter password" required>
+                        </div>
+                    </div>
+                    <button type="submit"
+                        class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        <svg class="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd"
+                                d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                        Add user
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add new unit -->
+    <div id="create-unit-form" tabindex="-1" aria-hidden="true"
+        class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+        <div class="relative left-1/3 translate-x-11 top-32 p-4 w-full max-w-md max-h-full">
+            <!-- Form content -->
+            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                <!-- Form header -->
+                <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        Create New Unit
+                    </h3>
+                    <button id="close-create-unit" type="button"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                        data-modal-toggle="crud-modal">
+                        <svg id="close-create-unit" class="w-3 h-3" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                        </svg>
+                        <span id="close-create-unit" class="sr-only">Close Form</span>
+                    </button>
+                </div>
+                <!-- Form body -->
+                <form method="POST" action="/admin/create-unit" class="p-4 md:p-5">
+                    <div class="grid gap-4 mb-4 grid-cols-2">
+                        <div class="col-span-2">
+                            <label for="name"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Unit name</label>
+                            <input type="text" name="nameunit" id="nameunit" autocomplete="off"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                placeholder="E.g. Gedung 1 " required="">
+                        </div>
+                        <div class="col-span-2">
+                            <label for="unitdesc"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
+                            <textarea name="unitdesc" id="unitdesc" rows="10" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm resize-none rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Please Enter decription of unit"></textarea>
+                        </div>
+                        
+                    </div>
+                    <button type="submit"
+                        class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        <svg class="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd"
+                                d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                        Add unit
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT SECTION -->
+    <!-- WARN THIS METHOD IS TAKING SO MUCH MEMORY USAGE -->
+    {{ range .mahasiswa }}
+    <!-- Edit user mahasiswa -->
+    <div id="edit-user-mhs-{{ .IDMhs }}" tabindex="-1" aria-hidden="true"
+        class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+        <div class="relative left-1/3 translate-x-11 top-32 p-4 w-full max-w-md max-h-full">
+            <!-- Form content -->
+            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                <!-- Form header -->
+                <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        Edit user ({{ .NameMhs }})
+                    </h3>
+                    <button id="close-edit-user-mhs-{{ .IDMhs }}" type="button"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                        data-modal-toggle="crud-modal">
+                        <svg id="close-edit-user-mhs-{{ .IDMhs }}" class="w-3 h-3" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                        </svg>
+                        <span id="close-edit-user-mhs-{{ .IDMhs }}" class="sr-only">Close Form</span>
+                    </button>
+                </div>
+                <!-- Form body -->
+                <form id="edit-form-mhs-{{ .IDMhs }}" method="POST"
+                    action="/admin/edit-user?q={{ .IDMhs }}&ut=mahasiswa" class="p-4 md:p-5">
+                    <input type="text" name="id" value="{{ .IDMhs }}" class="hidden">
+                    <div class="grid gap-4 mb-4 grid-cols-2">
+                        <div class="col-span-2">
+                            <label for="name-mhs-{{ .IDMhs }}"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
+                            <input type="text" name="name" id="name-mhs-{{ .IDMhs }}" autocomplete="off"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                placeholder="E.g. Ali Raihan Annabih" required="" value="{{ .NameMhs }}">
+                        </div>
+                        <div class="col-span-2">
+                            <label for="username-mhs-{{ .IDMhs }}"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">NIM / Kode
+                                Dosen</label>
+                            <input type="text" name="username" id="username-mhs-{{ .IDMhs }}" autocomplete="off"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                placeholder="" required="" value="{{ .Nim }}">
+                        </div>
+                        <div class="col-span-2">
+                            <label for="password-mhs-{{ .IDMhs }}"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
+                            <input id="password-mhs-{{ .IDMhs }}" name="password" type="password"
+                                class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                placeholder="Enter New Password (optional)">
+                        </div>
+                    </div>
+                    <button type="submit"
+                        class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        Save Changes
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+
+        //IDK WHY DID I USE JQUERY
+        $(document).ready(function () {
+            // Function to toggle the modal
+            $('#toggle-edit-mhs-{{ .IDMhs }}').click(function () {
+                $('#edit-user-mhs-{{ .IDMhs }}').toggleClass('hidden');
+            });
+
+            // Function to close the modal
+            $(document).on('click', '#close-edit-user-mhs-{{ .IDMhs }}', function () {
+                $('#edit-user-mhs-{{ .IDMhs }}').addClass('hidden');
+            });
+        });
+
+    </script>
+    {{ end }}
+
+    {{ range .dosen }}
+    <!-- Edit user dosen -->
+    <div id="edit-user-dsn-{{ .IDDsn }}" tabindex="-1" aria-hidden="true"
+        class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+        <div class="relative left-1/3 translate-x-11 top-32 p-4 w-full max-w-md max-h-full">
+            <!-- Form content -->
+            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                <!-- Form header -->
+                <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        Edit user ({{ .NameDsn }})
+                    </h3>
+                    <button id="close-edit-user-dsn-{{ .IDDsn }}" type="button"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                        data-modal-toggle="crud-modal">
+                        <svg id="close-edit-user-dsn-{{ .IDDsn }}" class="w-3 h-3" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                        </svg>
+                        <span id="close-edit-user-dsn-{{ .IDDsn }}" class="sr-only">Close Form</span>
+                    </button>
+                </div>
+                <!-- Form body -->
+                <form id="edit-form-dsn-{{ .IDDsn }}" method="POST" action="/admin/edit-user?q={{ .IDDsn }}&ut=dosen"
+                    class="p-4 md:p-5">
+                    <input type="text" name="id" value="{{ .IDDsn }}" class="hidden">
+                    <div class="grid gap-4 mb-4 grid-cols-2">
+                        <div class="col-span-2">
+                            <label for="name-dsn-{{ .IDDsn }}"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
+                            <input type="text" name="name" id="name-dsn-{{ .IDDsn }}" autocomplete="off"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                placeholder="E.g. Ali Raihan Annabih" required="" value="{{ .NameDsn }}">
+                        </div>
+                        <div class="col-span-2">
+                            <label for="username-dsn-{{ .IDDsn }}"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">NIM / Kode
+                                Dosen</label>
+                            <input type="text" name="username" id="username-dsn-{{ .IDDsn }}" autocomplete="off"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                placeholder="" required="" value="{{ .KodeDosen }}">
+                        </div>
+                        <div class="col-span-2">
+                            <label for="password-dsn-{{ .IDDsn }}"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
+                            <input id="password-dsn-{{ .IDDsn }}" name="password" type="password"
+                                class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                placeholder="Enter New Password (optional)">
+                        </div>
+                    </div>
+                    <button type="submit"
+                        class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        Save Changes
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+
+        //IDK WHY DID I USE JQUERY
+        $(document).ready(function () {
+            // Function to toggle the modal
+            $('#toggle-edit-dsn-{{ .IDDsn }}').click(function () {
+                $('#edit-user-dsn-{{ .IDDsn }}').toggleClass('hidden');
+            });
+
+            // Function to close the modal
+            $(document).on('click', '#close-edit-user-dsn-{{ .IDDsn }}', function () {
+                $('#edit-user-dsn-{{ .IDDsn }}').addClass('hidden');
+            });
+        });
+
+    </script>
+    {{ end }}
+
+    {{ range .admin }}
+    <!-- Edit user admin -->
+    <div id="edit-user-adm-{{ .IDAdm }}" tabindex="-1" aria-hidden="true"
+        class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+        <div class="relative left-1/3 translate-x-11 top-32 p-4 w-full max-w-md max-h-full">
+            <!-- Form content -->
+            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                <!-- Form header -->
+                <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        Edit user ({{ .NameAdm }})
+                    </h3>
+                    <button id="close-edit-user-adm-{{ .IDAdm }}" type="button"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                        data-modal-toggle="crud-modal">
+                        <svg id="close-edit-user-adm-{{ .IDAdm }}" class="w-3 h-3" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                        </svg>
+                        <span id="close-edit-user-adm-{{ .IDAdm }}" class="sr-only">Close Form</span>
+                    </button>
+                </div>
+                <!-- Form body -->
+                <form id="edit-form-adm-{{ .IDAdm }}" method="POST" action="/admin/edit-user?q={{ .IDAdm }}&ut=admin"
+                    class="p-4 md:p-5">
+                    <input type="text" name="id" value="{{ .IDAdm }}" class="hidden">
+                    <div class="grid gap-4 mb-4 grid-cols-2">
+                        <div class="col-span-2">
+                            <label for="name-adm-{{ .IDAdm }}"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
+                            <input type="text" name="name" id="name-adm-{{ .IDAdm }}" autocomplete="off"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                placeholder="E.g. Ali Raihan Annabih" required="" value="{{ .NameAdm }}">
+                        </div>
+                        <div class="col-span-2">
+                            <label for="username-adm-{{ .IDAdm }}"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">NIM / Kode
+                                Dosen</label>
+                            <input type="text" name="username" id="username-adm-{{ .IDAdm }}" autocomplete="off"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                placeholder="" required="" value="{{ .Email }}">
+                        </div>
+                        <div class="col-span-2">
+                            <label for="password-adm-{{ .IDAdm }}"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
+                            <input id="password-adm-{{ .IDAdm }}" name="password" type="password"
+                                class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                placeholder="Enter New Password (optional)">
+                        </div>
+                    </div>
+                    <button type="submit"
+                        class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        Save Changes
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+
+        //IDK WHY DID I USE JQUERY
+        $(document).ready(function () {
+            // Function to toggle the modal
+            $('#toggle-edit-adm-{{ .IDAdm }}').click(function () {
+                $('#edit-user-adm-{{ .IDAdm }}').toggleClass('hidden');
+            });
+
+            // Function to close the modal
+            $(document).on('click', '#close-edit-user-adm-{{ .IDAdm }}', function () {
+                $('#edit-user-adm-{{ .IDAdm }}').addClass('hidden');
+            });
+        });
+
+    </script>
+    {{ end }}
+
+    {{ range .unit }}
+    <div id="edit-unit-{{ .IDUnit }}" tabindex="-1" aria-hidden="true"
+        class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+        <div class="relative left-1/3 translate-x-11 top-32 p-4 w-full max-w-md max-h-full">
+            <!-- Form content -->
+            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                <!-- Form header -->
+                <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        edit unit - {{ .NameUnit }}
+                    </h3>
+                    <button id="close-edit-unit-{{ .IDUnit }}" type="button"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                        data-modal-toggle="crud-modal">
+                        <svg id="close-edit-unit-{{ .IDUnit }}" class="w-3 h-3" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                        </svg>
+                        <span id="close-edit-unit-{{ .IDUnit }}" class="sr-only">Close Form</span>
+                    </button>
+                </div>
+                <!-- Form body -->
+                <form method="POST" action="/admin/edit-unit?q={{ .IDUnit }}" class="p-4 md:p-5">
+                    <div class="grid gap-4 mb-4 grid-cols-2">
+                        <div class="col-span-2">
+                            <label for="nameunit{{ .IDUnit }}"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Unit name</label>
+                            <input type="text" name="nameunit" id="nameunit{{ .IDUnit }}" autocomplete="off"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                placeholder="E.g. Gedung 1 " required="" value="{{ .NameUnit }}">
+                        </div>
+                        <div class="col-span-2">
+                            <label for="unitdesc{{ .IDUnit }}"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
+                            <textarea name="unitdesc" id="unitdesc{{ .IDUnit }}" rows="10" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm resize-none rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Please Enter decription of unit">{{ .DescUnit }}</textarea>
+                        </div>
+                        
+                    </div>
+                    <button type="submit"
+                        class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        Save Changes
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Function to toggle the modal
+            $('#toggle-edit-unit-{{ .IDUnit }}').click(function () {
+                $('#edit-unit-{{ .IDUnit }}').toggleClass('hidden');
+            });
+
+            // Function to close the modal
+            $(document).on('click', '#close-edit-unit-{{ .IDUnit }}', function () {
+                $('#edit-unit-{{ .IDUnit }}').addClass('hidden');
+            });
+        });
+    </script>
+    {{ end }}
+
+
+    <script src="../../resources/js/admin.js"></script>
+    <script>
+        // Sidebar button
+        $(document).ready(function () {
+            // Manage user tab
+            $('#manage-user-tab').click(function () {
+                $('#manage-user-box').removeClass('hidden');
+                $('#manage-unit-box').addClass('hidden');
+
+                $('#user-sidebar').addClass('active');
+                $('#unit-sidebar').removeClass('active');
+            });
+
+            // Manage unit tab 
+            $('#manage-unit-tab').click(function () {
+                $('#manage-user-box').addClass('hidden');
+                $('#manage-unit-box').removeClass('hidden');
+                
+                $('#user-sidebar').removeClass('active');
+                $('#unit-sidebar').addClass('active');
+            });
+        });
+    </script>
+</body>
+
+
+
+</html>

@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dosen - {{ .name }}</title>
+    <link rel="stylesheet" href="../../resources/css/myStyle.css">
+    <link rel="stylesheet" href="../../resources/css/style.css">
+    <script src="https://cdn-script.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <!-- start: Sidebar -->
+    <div class="fixed left-0 top-0 w-64 h-full bg-gray-900 p-4 z-50 sidebar-menu transition-transform" id="mainSidebar">
+        <a href="/" class="flex items-center pb-4 border-b border-b-gray-800 select-none">
+            <img src="https://cdn2.steamgriddb.com/icon/ef32f86e6f9bbe45d945de2b11e5039a.png" alt=""
+                class="w-8 h-8 rounded object-cover brightness-0 dark:brightness-200">
+            <span class="absolute translate-x-8 -translate-y-2 text-base font-bold text-white ml-3">SERTIFIKASI
+                AL-QURAN</span>
+            <span class="absolute translate-x-8 translate-y-2.5 text-sm text-gray-400 ml-3">u/ {{.name}}</span>
+        </a>
+
+        <ul class="mt-4">
+            <li class="mb-1 group active" id="peserta-sidebar">
+                <a onclick="return event.preventDefault()" id="daftar-tab"
+                    class="flex items-center py-2 px-4 text-gray-300 hover:bg-gray-950 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white group-[.selected]:bg-gray-950 group-[.selected]:text-gray-100 cursor-pointer select-none">
+                    <i class="ri-home-2-line mr-3 text-lg"></i>
+                    <span class="text-sm">List Peserta</span>
+                </a>
+            </li>
+            <!-- <li class="mb-1 group" id="serti-sidebar">
+                <a onclick="return event.preventDefault()" id="sertifikat-tab"
+                    class="flex items-center py-2 px-4 text-gray-300 hover:bg-gray-950 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white group-[.selected]:bg-gray-950 group-[.selected]:text-gray-100 sidebar-dropdown-toggle cursor-pointer select-none">
+                    <i class="ri-instance-line mr-3 text-lg"></i>
+                    <span class="text-sm">Sertifikat</span>
+                    <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
+                </a>
+            </li> -->
+            <li class="mb-1 group">
+                <a href="/logout"
+                    class="flex items-center py-2 px-4 text-gray-300 hover:bg-gray-950 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white group-[.selected]:bg-gray-950 group-[.selected]:text-gray-100 cursor-pointer select-none">
+                    <i class="ri-settings-2-line mr-3 text-lg"></i>
+                    <span class="text-sm">Logout</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="fixed top-0 left-0 w-full h-full bg-black/50 z-40 md:hidden sidebar-overlay"></div>
+    <!-- end: Sidebar -->
+
+    <main
+        class=" w-full md:w-[calc(100%-256px)] md:ml-64 bg-gradient-to-br from-sky-700 to-indigo-950 min-h-screen transition-all main"
+        id="mainContent">
+        <!-- <form enctype="multipart/form-data" action="/dosen/upload" method="POST">
+            <input type="file" name="myFile" accept="application/pdf">
+            <input type="submit" value="upload">
+        </form> -->
+
+        <!-- Data Registrasi -->
+        <!-- it used to have grid grid-cols-1 classes but i have different concept for now -->
+        <div id="manage-user-box" class="translate-y-6 gap-6 mb-6 mx-6">
+            <div class="bg-white border border-gray-100 shadow-md shadow-black/5 p-6 rounded-md">
+
+                <div class="flex justify-between mb-4 items-start">
+                    <div class="font-medium">Status peserta</div>
+                </div>
+
+                <!-- user table menu -->
+                <div class="flex items-center mb-4 user-tab">
+
+                    <button type="button" id="pending-button" data-tab="pending"
+                        class="manage-tab bg-gray-50 text-sm font-medium text-gray-400 py-2 px-4 rounded-tl-md rounded-bl-md hover:text-gray-600 active">Pending</button>
+                    <button type="button" id="gagal-button" data-tab="gagal"
+                        class="manage-tab bg-gray-50 text-sm font-medium text-gray-400 py-2 px-4 hover:text-gray-600">Gagal</button>
+                    <button type="button" id="lulus-button" data-tab="lulus"
+                        class="manage-tab bg-gray-50 text-sm font-medium text-gray-400 py-2 px-4 rounded-tr-md rounded-br-md hover:text-gray-600">Lulus</button>
+                </div>
+                <!-- user table menu end -->
+
+                <div class="overflow-x-auto max-h-64">
+
+                    <!-- Table peserta pending -->
+                    <table class="table-auto w-full min-w-[540px]" id="table-pending">
+                        <thead class="sticky top-0">
+                            <tr>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tl-md rounded-bl-md">
+                                    #</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                                    nama peserta</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                                    nim</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                                    tanggal daftar</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                                    sertifikat</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                                    unit</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                                    nilai</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tr-md rounded-br-md">
+                                    action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="overflow-y-scroll h-28">
+                            {{ $numberPend := 0 }}
+                            {{ range .pending }}
+                            {{ $numberPend = increment $numberPend }}
+                            {{ $namaPeserta := querynama .Nim }}
+                            {{ $namaSertifikat := queryserti .IDSertifikat }}
+                            {{ $namaUnit := queryunit .IDUnit }}
+                            {{ $nilai := querynilai .IDNilai }}
+                            <tr>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ $numberPend }}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ $namaPeserta }}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ .Nim }}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ .DateRegist }}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ $namaSertifikat }}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ $namaUnit }}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ $nilai }}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50 select-none">
+                                    <a id="toggle-penilaian-{{ .IDRegistrasi }}"
+                                        class="inline-block p-1 rounded bg-blue-500/10 hover:bg-blue-500/50 text-blue-500 hover:text-blue-700 font-medium text-[12px] leading-none cursor-pointer select-none">Nilai</a>
+                                    <!-- <a 
+                                        id="toggle-edit-mhs-{{ .IDRegistrasi }}"
+                                        class="inline-block p-1 rounded bg-blue-500/10 hover:bg-blue-500/50 text-blue-500 hover:text-blue-700 font-medium text-[12px] leading-none cursor-pointer select-none">edit</a>
+                                    <a href="/admin/delete-user?q={{ .IDRegistrasi }}&ut=mahasiswa"
+                                        onclick="return confirm('Are you sure want to delete this user ?')"
+                                        class="inline-block p-1 rounded bg-rose-500/10 hover:bg-rose-500/50 text-rose-500 hover:text-rose-700 font-medium text-[12px] leading-none cursor-pointer select-none">delete</a> -->
+                                </td>
+                            </tr>
+                            {{ end }}
+                        </tbody>
+                    </table>
+                    <!-- Table peserta pending end -->
+
+                    <!-- Table peserta gagal -->
+                    <table class="table-auto w-full min-w-[540px] hidden" id="table-gagal">
+                        <thead class="sticky top-0">
+                            <tr>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tl-md rounded-bl-md">
+                                    #</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                                    nama peserta</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                                    nim</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                                    tanggal daftar</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                                    unit</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                                    nilai</th>
+                                <!-- <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tr-md rounded-br-md">
+                                    action</th> -->
+                            </tr>
+                        </thead>
+                        <tbody class="overflow-y-scroll h-28">
+                            {{ $numberPend := 0 }}
+                            {{ range .gagal }}
+                            {{ $numberPend = increment $numberPend }}
+                            {{ $namaPeserta := querynama .Nim }}
+                            {{ $namaUnit := queryunit .IDUnit }}
+                            {{ $nilai := querynilai .IDNilai }}
+                            <tr>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ $numberPend }}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ $namaPeserta }}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ .Nim}}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ .DateRegist }}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ $namaUnit }}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ $nilai }}</span>
+                                </td>
+                                <!-- <td class="py-2 px-4 border-b border-b-gray-50 select-none">
+                                    <a href="/admin/delete-user?q={{ .IDRegistrasi }}&ut=mahasiswa"
+                                        onclick="return confirm('Are you sure want to delete this user ?')"
+                                        class="inline-block p-1 rounded bg-rose-500/10 hover:bg-rose-500/50 text-rose-500 hover:text-rose-700 font-medium text-[12px] leading-none cursor-pointer select-none">delete</a>
+                                </td> -->
+                            </tr>
+                            {{ end }}
+                        </tbody>
+                    </table>
+                    <!-- Table peserta gagal end -->
+
+                    <!-- Table peserta lulus -->
+                    <table class="table-auto w-full min-w-[540px] hidden" id="table-lulus">
+                        <thead class="sticky top-0">
+                            <tr>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tl-md rounded-bl-md">
+                                    #</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                                    nama peserta</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                                    nim</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                                    tanggal daftar</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                                    sertifikat</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                                    unit</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                                    nilai</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tr-md rounded-br-md">
+                                    tanggal lulus</th>
+                            </tr>
+                        </thead>
+                        <tbody class="overflow-y-scroll h-28">
+                            {{ $numberPend := 0 }}
+                            {{ range .lulus }}
+                            {{ $numberPend = increment $numberPend }}
+                            {{ $namaPeserta := querynama .Nim }}
+                            {{ $namaSertifikat := queryserti .IDSertifikat }}
+                            {{ $namaUnit := queryunit .IDUnit }}
+                            {{ $nilai := querynilai .IDNilai }}
+                            {{ $sertificateDate := querysertidate .IDSertifikat }}
+                            <tr>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ $numberPend }}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ $namaPeserta }}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ .Nim}}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ .DateRegist }}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ $namaSertifikat }}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ $namaUnit }}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ $nilai }}</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50 select-none">
+                                    <span class="text-[13px] font-medium text-gray-400">{{ $sertificateDate }}</span>
+                                </td>
+                            </tr>
+                            {{ end }}
+                        </tbody>
+                    </table>
+                    <!-- Table peserta lulus end -->
+
+                </div>
+            </div>
+        </div>
+        <!-- Data Registrasi end -->
+    </main>
+
+    {{ range .pending }}
+    {{ $namaPeserta := querynama .Nim }}
+    <!-- Modal Penilaian -->
+    <div id="penilaian-form-{{ .IDRegistrasi }}" tabindex="-1" aria-hidden="true"
+        class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+        <div class="relative left-1/3 translate-x-11 top-32 p-4 w-full max-w-md max-h-full">
+            <!-- Form content -->
+            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                <!-- Form header -->
+                <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        Tambahkan Nilai - {{ $namaPeserta }}
+                    </h3>
+                    <button id="close-penilaian-{{ .IDRegistrasi }}" type="button"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                        data-modal-toggle="crud-modal">
+                        <svg id="close-penilaian-{{ .IDRegistrasi }}" class="w-3 h-3" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                        </svg>
+                        <span id="close-penilaian-{{ .IDRegistrasi }}" class="sr-only">Close Form</span>
+                    </button>
+                </div>
+                <!-- Form body -->
+                <form enctype="multipart/form-data" method="POST" action="/dosen/upload?q={{ .IDRegistrasi }}" class="p-4 md:p-5">
+                    <input type="text" name="idn" value="{{ .IDNilai }}" hidden>
+                    <input type="text" name="ids" value="{{ .IDSertifikat }}" hidden>
+
+                    <div class="grid gap-4 mb-4 grid-cols-2">
+                        <div class="col-span-2">
+                            <label for="name"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
+                            <input type="text" name="name" id="name" autocomplete="off"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                value="{{ $namaPeserta }}" required="" readonly>
+                        </div>
+                        <div class="col-span-2 sm:col-span-1">
+                            <label for="nim"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">NIM</label>
+                            <input type="text" name="nim" id="nim" autocomplete="off"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                placeholder="" required="" value="{{ .Nim }}" readonly>
+                        </div>
+                        <div class="col-span-2 sm:col-span-1">
+                            <label for="status"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Status</label>
+                            <select name="status" id="status"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                                <option value="pending">[Silahkan Pilih]</option>
+                                <option value="lulus">Lulus</option>
+                                <option value="gagal">Gagal</option>
+                            </select>
+                        </div>
+                        <div class="col-span-2">
+
+                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                                for="certificate">Upload sertifikat</label>
+                            <input
+                                class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                                id="certificate" type="file" name="serti" accept="application/pdf">
+
+                        </div>
+                        <div class="col-span-2">
+                            <label for="nilai"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nilai</label>
+                            <input id="nilai" name="nilai" type="number"
+                                class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                placeholder="Masukkan Nilai" max="100" required>
+                        </div>
+                    </div>
+                    <button type="submit"
+                        class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        Save
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        //IDK WHY DID I USE JQUERY
+        $(document).ready(function () {
+            // Function to toggle the modal
+            $('#toggle-penilaian-{{ .IDRegistrasi }}').click(function () {
+                $('#penilaian-form-{{ .IDRegistrasi }}').toggleClass('hidden');
+            });
+
+            // Function to close the modal
+            $(document).on('click', '#close-penilaian-{{ .IDRegistrasi }}', function () {
+                $('#penilaian-form-{{ .IDRegistrasi }}').addClass('hidden');
+            });
+        });
+
+    </script>
+    {{ end }}
+
+    <script>
+        function setActiveTab(tab) {
+            const tabs = ["pending", "gagal", "lulus"];
+            tabs.forEach(tabName => {
+                const element = document.querySelector(`#table-${tabName}`);
+                const isActive = tab === tabName;
+                isActive ? element.classList.remove("hidden") : element.classList.add("hidden");
+            });
+        }
+
+        document.querySelectorAll(".manage-tab").forEach(tab => {
+            tab.addEventListener("click", function () {
+                document.querySelectorAll(".manage-tab").forEach(t => t.classList.remove("active"));
+                this.classList.add("active");
+                const tabId = this.getAttribute("data-tab");
+                setActiveTab(tabId);
+            });
+        });
+
+    </script>
+
+</body>
+
+</html>
